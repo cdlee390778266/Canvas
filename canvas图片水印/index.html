@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>canvas图片水印</title>
+        <style>
+            body{
+                background: #000;
+            }
+            #canvas{
+                display: block;
+                margin:20px auto;
+                margin-top: 100px;
+            }
+            #waterMask{
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <canvas id="waterMask"></canvas>  
+        <script>
+            var canvas = document.getElementById('canvas');
+            var canvasContext = canvas.getContext("2d");
+            var waterMask = document.getElementById('waterMask');
+            var waterContext = waterMask.getContext("2d");
+            var image = new Image();
+
+            canvas.width = 400;
+            canvas.height = 300;
+            waterMask.width = 120;
+            waterMask.height = 30;
+
+            waterContext.font = "20px 微软雅黑";
+            waterContext.strokeStyle = 'rgba(255,255,255,0.5)'
+            waterContext.strokeText('Hello World',0,30);
+
+            image.src = 'images/1.jpg';
+            image.onload = function(){
+                canvasContext.drawImage(image, 0,0,canvas.width,canvas.height);
+                canvasContext.drawImage(waterMask, canvas.width - waterMask.width,canvas.height - waterMask.height - 10);
+            }
+
+        </script>
+
+    </body>
+</html>

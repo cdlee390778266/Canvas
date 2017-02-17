@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Canvas进行像素级操作</title>
+        <style>
+            body{
+                background: #000;
+            }
+            .box{
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 100px;
+                text-align: center;
+            }
+            canvas{
+                border:1px solid #fff;
+                display: inline-block;
+                margin: 0 10px;
+                box-shadow: 0 0 5px 4px rgba(255,255,255,0.5);
+            }
+            button{
+                display: block;
+                margin: 10px auto;
+                margin-top: 40px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="box">
+            <canvas id="canvasa"></canvas>
+            <canvas id="canvasb"></canvas> 
+            <button id="draw">Pointer</button>
+        </div>
+         
+        <script>
+           var canvasa = document.getElementById('canvasa');
+           var canvasaContext = canvasa.getContext("2d");
+           var canvasb = document.getElementById('canvasb');
+           var canvasbContext = canvasb.getContext("2d");
+           var draw = document.getElementById('draw');
+           canvasa.width = 400;
+           canvasa.height = 300;
+           canvasb.width = 400;
+           canvasb.height = 300;
+
+           var image = new Image();
+           image.src = 'images/1.jpg';
+           image.onload = function(){
+                canvasaContext.drawImage(image, 0,0,canvasa.width,canvasa.height);
+           }
+
+           draw.onclick = function(){
+                canvasbContext.clearRect(0,0, canvasb.width, canvasb.height);
+                var imageData = canvasaContext.getImageData(0, 0, canvasa.width, canvasa.height);
+                // canvasbContext.putImageData(imageData, 0, 0,0,0,canvasb.width,canvasb.height);
+                canvasbContext.putImageData(imageData, 0, 0,50,50,canvasb.width -100,canvasb.height -100);
+           }
+
+        </script>
+
+    </body>
+</html>

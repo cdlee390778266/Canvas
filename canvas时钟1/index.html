@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>canvas时钟1</title>
+        <script src="digit.js"></script>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <script>
+            var windowWidth = 1024;
+            var windowHeight = 768;
+            var r = 6;
+            var ml = 100;
+            var mt = 100;
+            var d = 0;
+
+            var colorsArr = ['blue','green','yellow','#ff11dd','#00feaa','#aadd33','#22AAff','#66ddaa','#99afea','#000'];
+            var saveColorArr = [];
+
+            var ballNum = 0;
+            window.onload = function(){
+                var canvas = document.getElementById('canvas');
+                canvas.width = windowWidth;
+                canvas.height = windowHeight;
+                var context = canvas.getContext("2d");
+                render(context);
+                setInterval(function(){
+                    render(context);
+
+                    addBall(ballNum,context,d);
+                    d++;
+                }, 20);
+            }
+
+            function render(context){
+                var date = new Date();
+                var numsArr = [];
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var seconds = date.getSeconds();
+                
+                numsArr.push(parseInt(hours/10));
+                numsArr.push(hours%10);
+                numsArr.push(10);
+                numsArr.push(parseInt(minutes/10));
+                numsArr.push(minutes%10);
+                numsArr.push(10);
+                numsArr.push(parseInt(seconds/10));
+                numsArr.push(seconds%10);
+                
+                context.clearRect(0, 0,windowWidth , windowHeight);
+                for(var i=0;i<numsArr.length;i++){
+                    if(numsArr.length-1 == i){
+                        if(ballNum != numsArr[i]){
+                            ballNum = numsArr[i];
+                        }
+                        
+                    }
+                    renderDigit(0,0,i,numsArr[i],context);
+                    
+                }
+            }
+
+            function renderDigit(x,y,index,num,context){
+                for(var i=0;i<digit[num].length;i++){
+                    
+                    for(var j=0;j<digit[num][i].length;j++){
+                        context.beginPath();
+                        if(digit[num][i][j]){
+                            context.fillStyle = '#000';
+                            context.arc(r*(1+2*j)+index*2*r*10 +ml, r*(1+2*i)+mt,r,0, 2*Math.PI);
+                            context.fill();
+                            context.closePath()
+                        }
+                        
+                    }
+                }
+            }
+
+            function addBall(num,context,x){
+               
+                for(var i=0;i<digit[num].length;i++){
+                    for(var j=0;j<digit[num][i].length;j++){
+                        if(digit[num][i][j]){
+                            context.beginPath();
+                            var color = colorsArr[parseInt(Math.random()*colorsArr.length)];
+                            context.fillStyle = color;
+                            
+                            var sx = r*(1+2*j)+7*2*r*10 +ml;
+                            var sy = r*(1+2*i)+mt;
+                            var vx = -1.5*x;
+                            var a = 3-Math.random();
+                            var vy = -5 + a*a*x;
+                            
+                            var dx = 
+                            context.arc(sx+vx,sy+vy, r, 0, 2*Math.PI);
+                            context.fill();
+                        }
+                    }
+                }
+            }
+            
+        </script>
+    </body>
+</html>

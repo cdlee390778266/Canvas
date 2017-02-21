@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Canvas进行像素级操作-图片变色</title>
+        <script src="../js/jquery-1.10.1.js"></script>
+        <style>
+            #canvas{
+              display: block;
+              margin-top: 20px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            .colors{
+              display: inline-block;
+              width : 20px;
+              height: 20px;
+              margin: 0 10px;
+            }
+
+            #red{
+              background: red;
+            }
+            #green{
+              background: green;
+            }
+            #blue{
+              background: blue;
+            }
+            #clear{
+              font-size: 12px;
+              padding: 2px 12px;
+              border: 1px solid #000;
+              border-radius: 4px;
+              float: right;
+              cursor: pointer;
+            }
+            .handle{
+              width: 600px;
+              margin-top: 10px;
+              margin-left: auto;
+              margin-right: auto;
+              text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+      <canvas id="canvas"></canvas>
+      <div class="handle">
+          <span id="red" class="colors"></span>
+          <span id="blue" class="colors"></span>
+          <span id="green" class="colors"></span>
+          <span id="clear">清除</span>
+      </div>
+      <script>
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext("2d");
+        var isMouseDown = false;
+        var lastPos = {x:0,y:0};
+        var lastTime = 0;
+        var lastLineWidth = -1;
+
+        canvas.width = 600;
+        canvas.height = 600;
+
+        function drawGrid(){
+
+          context.save();
+
+          context.beginPath();
+          context.strokeStyle = 'red';
+          context.lineWidth = 6;
+          context.strokeRect(0, 0, 600, 600);
+
+          context.beginPath();
+          context.lineWidth = 2;
+          context.moveTo(0, 0);
+          context.lineTo(600, 600);
+          context.moveTo(600, 0);
+          context.lineTo(0,600);
+          context.moveTo(0,300);
+          context.lineTo(600,300);
+          context.moveTo(300, 0);
+          context.lineTo(300,600);
+          context.stroke();
+
+          context.restore();
+        }
+
+        function getPos(x,y){
+          return {
+            x : Math.round(x-canvas.getBoundingClientRect().left),
+            y : Math.round(y-canvas.getBoundingClientRect().top)
+          }
+        }
+
+        function distance(lastPos,currentPos){
+          return Math.sqrt((lastPos.x - currentPos.x)*(lastPos.x - currentPos.x)+(lastPos.y - currentPos.y)*(lastPos.y - currentPos.y));
+        }
+
+        function getLineWidth(s,t){
+          var v = s/t;
+          var rWidth = 0;
+          if(v<=0.1){
+            rWidth = 30;
+          }else if(v>=10){
+            rWidth = 1;
+          }else{
+            rWidth = 30 - (30-1)/(10-0.1)*v;
+          }
+          if(lastLineWidth == -1){
+            return rWidth
+          }
+          return lastLineWidth*0.6 + rWidth*0.4;
+        }
+
+        canvas.onmousedown = function(e){
+          e.preventDefault();
+          isMouseDown = true;
+          lastPos = getPos(e.clientX,e.clientY);
+          lastTime = new Date().getTime();
+
+        }
+
+        canvas.onmouseup = function(e){
+          e.preventDefault();
+          isMouseDown = false;
+        }
+
+        canvas.onmouseout = function(e){
+          e.preventDefault();
+          isMouseDown = false;
+        }
+
+        canvas.onmousemove = function(e){
+          e.preventDefault();
+          if(isMouseDown){
+            var currentTime = new Date().getTime();
+            var currentPos = getPos(e.clientX,e.clientY);
+            var s = distance(lastPos,currentPos);
+            var t = currentTime - lastTime;
+            context.beginPath();
+            var currentLineWidth = getLineWidth(s,t);
+            context.lineWidth = currentLineWidth;
+            context.lineCap = 'round';
+            context.lineJoin = 'round';
+            context.moveTo(lastPos.x, lastPos.y);
+            context.lineTo(currentPos.x,currentPos.y);
+            context.stroke();
+            lastPos = currentPos;
+            lastTime = currentTime;
+            lastLineWidth = currentLineWidth;
+          }
+        }
+
+        drawGrid();
+
+        $('#red').click(function(){
+            context.strokeStyle = 'red';
+        })
+
+        $('#blue').click(function(){
+            context.strokeStyle = 'blue';
+        })
+
+        $('#green').click(function(){
+            context.strokeStyle = 'green';
+        })
+
+        $('#clear').click(function(){
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          drawGrid();
+        })
+
+      </script>
+    </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+    <script>
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext("2d");
+        var ball = {
+            x : 20,
+            y : 50,
+            vx : 3,
+            vy : 3,
+            g : 0.2,
+            top : 30
+        };
+        canvas.width = 1000;
+        canvas.height = 500;
+
+        setInterval(update, 30);
+
+        function update(){
+            context.beginPath();
+            context.clearRect(0,0, canvas.width, canvas.height);
+            getPos();
+            context.arc(ball.x, ball.y, 10, 0, 2*Math.PI);
+            context.fill()
+        }
+
+        function getPos(){
+            ball.x += ball.vx;
+            ball.vy += ball.g;
+            ball.y += ball.vy;
+
+            if( ball.y>canvas.height-10 ){
+                ball.y = canvas.height-10;
+                ball.vy = -ball.vy*0.7;
+            }
+        }
+
+    </script>
+
+    
+</body>
+</html>

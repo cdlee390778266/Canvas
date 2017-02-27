@@ -14,6 +14,8 @@
             var ml = 100;
             var mt = 100;
             var d = 0;
+            var ballIndex = -1;
+            var ballDataArr = [];
 
             var colorsArr = ['blue','green','yellow','#ff11dd','#00feaa','#aadd33','#22AAff','#66ddaa','#99afea','#000'];
             var saveColorArr = [];
@@ -25,12 +27,13 @@
                 canvas.height = windowHeight;
                 var context = canvas.getContext("2d");
                 render(context);
+
                 setInterval(function(){
                     render(context);
 
-                    addBall(ballNum,context,d);
+                    addBall(context);
                     d++;
-                }, 20);
+                }, 50);
             }
 
             function render(context){
@@ -54,6 +57,8 @@
                     if(numsArr.length-1 == i){
                         if(ballNum != numsArr[i]){
                             ballNum = numsArr[i];
+                            ballIndex++;
+                            addBallData(ballNum,context,d)
                         }
                         
                     }
@@ -78,27 +83,56 @@
                 }
             }
 
-            function addBall(num,context,x){
-               
+            function addBallData(num,context,x){
+               ballDataArr[0] = [];
                 for(var i=0;i<digit[num].length;i++){
                     for(var j=0;j<digit[num][i].length;j++){
                         if(digit[num][i][j]){
-                            context.beginPath();
                             var color = colorsArr[parseInt(Math.random()*colorsArr.length)];
-                            context.fillStyle = color;
+                    
+                            var ball = {
+                                sx : r*(1+2*j)+7*2*r*10 +ml,
+                                sy : r*(1+2*i)+mt,
+                                vx : -5,
+                                vy : -5-Math.random(),
+                                top : 10*Math.random(),
+                                fillStyle : color,
+                                index : 0,
+                                g : Math.random()+0.5
+                            }
+
+                            if(!ballDataArr[ballIndex]){
+                                ballDataArr[ballIndex] = [];
+                            }
+
                             
-                            var sx = r*(1+2*j)+7*2*r*10 +ml;
-                            var sy = r*(1+2*i)+mt;
-                            var vx = -1.5*x;
-                            var a = 3-Math.random();
-                            var vy = -5 + a*a*x;
-                            
-                            var dx = 
-                            context.arc(sx+vx,sy+vy, r, 0, 2*Math.PI);
-                            context.fill();
+                            ballDataArr[ballIndex].push(ball);
                         }
                     }
                 }
+
+            }
+
+            function addBall(context){
+                console.log(ballDataArr)
+                for(var i=0;i<ballDataArr.length;i++){
+                    for(var j=0;j<ballDataArr[i].length;j++){
+                        context.beginPath();
+                        context.fillStyle = ballDataArr[i][j].fillStyle;
+                        ballDataArr[i][j].sx += ballDataArr[i][j].vx;
+                        ballDataArr[i][j].vy += ballDataArr[i][j].g;
+                        ballDataArr[i][j].sy += ballDataArr[i][j].vy;
+                        if(ballDataArr[i][j].sy>windowHeight-300){
+                            ballDataArr[i][j].sy = windowHeight-300
+                            ballDataArr[i][j].vy = -ballDataArr[i][j].vy*0.7 ;
+                        }
+                        context.arc(ballDataArr[i][j].sx,ballDataArr[i][j].sy, r, 0, 2*Math.PI);
+                        context.fill();
+                        ballDataArr[i][j].index++;
+                    }
+                }
+                
+
             }
             
         </script>

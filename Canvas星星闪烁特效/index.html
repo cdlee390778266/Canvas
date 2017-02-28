@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>canvas星星闪烁</title>
+  <style>
+    *{
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        var width = document.documentElement.clientWidth;
+        var height = document.documentElement.clientHeight;
+        var mainWidth = 600;
+        var mainHeight = 300;
+        var girlImg = new Image();
+        var starImg = new Image();
+        var starNums = 60;
+        var starsArr = [];
+
+        girlImg.src = 'images/girl.jpg';
+        starImg.src = 'images/star.png';
+
+
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext("2d");
+
+        canvas.width = width;
+        canvas.height = height;
+
+        init();
+
+        function init(){
+            drawBg();
+            drawImg();
+            drawStar();
+            setTimeout(init, 50);
+        }
+
+        function drawBg(){
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = '#393550';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawImg(){
+            context.drawImage(girlImg, 0, 0,mainWidth,mainHeight);
+           
+        }
+
+        function drawStar(){
+            if(!starsArr.length){
+               for(var i=0;i<starNums;i++){
+                    addStar();
+                } 
+            }
+
+            for(var i=0;i<starsArr.length;i++){
+                drawSingleStar(starsArr[i]);
+            }
+            
+        }
+
+        function addStar(){
+            var star = {
+                x : Math.random()*mainWidth,
+                y : Math.random()*mainHeight,
+                pos : Math.floor(Math.random()*6)
+            }
+            
+            starsArr.push(star);
+        }
+
+        function drawSingleStar(obj){
+            context.drawImage(starImg, obj.pos*7, 0, 7, 7, obj.x, obj.y, 7, 7);
+            obj.pos = ++obj.pos%7;
+        }
+
+    </script>
+</body>
+</html>

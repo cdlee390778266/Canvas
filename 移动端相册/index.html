@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>移动端相册</title>
+    <script src="../js/zepto.min.js"></script>
+    <link rel="stylesheet" href="../css/animate.min.css" /> 
+    <link rel="stylesheet" href="../css/bootstrap/css/bootstrap.min.css" />
+    <style>
+        .col-xs-4{
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        #container-large{
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 2;
+            background: #000;
+            display: none;
+        }
+    </style>
+    </head>
+<body>
+    <div class="container-fluid">
+        <div class="row" id="container" >
+        </div>
+        <div id="container-large">
+            <img src="" alt="" id="largeImg" />
+        </div>
+    </div>
+
+    <script>
+        $(function(){
+           var win = $(window); 
+           var total = 9;  
+           var img = [];  
+           var render = function(){
+                var winWidth = win.width();
+                var winHeight = win.height();
+                var tpl = '';
+                for(var i =9;i<total+9;i++){
+                    imgSrc = 'images/'+i+'.jpg';
+                    tpl += '<div class="col-xs-4 animated bounceIn"><canvas id="c'+ i +'" data-id="' + i + '"></canvas></div>';
+
+                    img[i] = new Image();
+                    img[i].src = imgSrc;
+                    img[i].index = i;
+                    img[i].onload = function(){
+                        var context = $('#c'+this.index)[0].getContext("2d");
+                        context.width = this.width;
+                        context.height = this.height;
+                        context.drawImage(this, 0,0);
+                    
+                    }
+                    
+                }
+                $('#container').html(tpl);
+
+           }
+           render();
+
+           $('#container').delegate('canvas', 'click', function(event) {
+               showLarge($(this).attr('data-id'));
+           });
+
+           function showLarge(id){
+                $('#container-large').show();
+                var imgObj = new Image();
+                imgObj.src =   'images/' + id + '.large.jpg';
+                imgObj.onload = function(){
+                    var imgW = this.width;
+                    var imgH = this.height;
+                    var zW = win.width();
+                    var zH = win.height();
+                    var relW = imgH/imgW*zW;
+                    var relH = imgW/imgH*zH; 
+                    var paddingTop=0,paddingLeft=0;
+                    if(imgW/imgH > 1.2){
+                        paddingTop = Math.abs(parseInt((zH-relH)/2));
+                        
+                        $('#largeImg').css('padding-top',paddingTop).css('width',zW).attr('src',this.src);
+                    }else{
+                        paddingLeft = Math.abs(parseInt((zW-relW)/2));
+                        $('#largeImg').css('padding-left',paddingLeft).css('height',zH).attr('src',this.src);
+                    }
+
+                    
+                }
+           }
+
+        })
+
+
+    </script>
+</body>
+</html>

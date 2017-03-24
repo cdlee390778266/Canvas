@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
     <title>移动端相册</title>
     <script src="../js/zepto.min.js"></script>
+    <script src="../js/touch.js"></script>
     <link rel="stylesheet" href="../css/animate.min.css" /> 
     <link rel="stylesheet" href="../css/bootstrap/css/bootstrap.min.css" />
     <style>
@@ -21,27 +23,33 @@
             background: #000;
             display: none;
         }
+        #container-large img{
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
     </style>
     </head>
 <body>
     <div class="container-fluid">
         <div class="row" id="container" >
         </div>
-        <div id="container-large">
-            <img src="" alt="" id="largeImg" />
+        <div id="container-large" class="animated fadeIn">
+            <img src="" alt="" id="largeImg" data-id='0' />
         </div>
     </div>
 
     <script>
         $(function(){
            var win = $(window); 
-           var total = 9;  
+           var total = 9; 
+           var base = 9; 
            var img = [];  
            var render = function(){
                 var winWidth = win.width();
                 var winHeight = win.height();
                 var tpl = '';
-                for(var i =9;i<total+9;i++){
+                for(var i =base;i<total+base;i++){
                     imgSrc = 'images/'+i+'.jpg';
                     tpl += '<div class="col-xs-4 animated bounceIn"><canvas id="c'+ i +'" data-id="' + i + '"></canvas></div>';
 
@@ -62,11 +70,11 @@
            }
            render();
 
-           $('#container').delegate('canvas', 'click', function(event) {
+           $('#container').delegate('canvas', 'tap', function(event) {
                showLarge($(this).attr('data-id'));
            });
 
-           function showLarge(id){
+           function showLarge(id,callback){
                 $('#container-large').show();
                 var imgObj = new Image();
                 imgObj.src =   'images/' + id + '.large.jpg';
@@ -75,21 +83,72 @@
                     var imgH = this.height;
                     var zW = win.width();
                     var zH = win.height();
-                    var relW = imgH/imgW*zW;
-                    var relH = imgW/imgH*zH; 
-                    var paddingTop=0,paddingLeft=0;
-                    if(imgW/imgH > 1.2){
-                        paddingTop = Math.abs(parseInt((zH-relH)/2));
+                    var relW = imgW/imgH*zH;
+                    var relH = imgH/imgW*zW; 
+                    console.log(relW,zW,relH,zH)
+                    var top=0,left=0;
+                    if( (imgW/imgH > 1.2 && relH<=zH) || (imgW/imgH <= 1.2 && relW>zW) ){
+                        top = parseInt((zH-relH)/2);
                         
-                        $('#largeImg').css('padding-top',paddingTop).css('width',zW).attr('src',this.src);
+                        $('#largeImg').css({
+                            'top' : top,
+                            'left' : 0,
+                            'width' : zW,
+                            'height' : relH
+                        }).attr({
+                            'data-id' : id,
+                            'src' : this.src
+                        });
                     }else{
-                        paddingLeft = Math.abs(parseInt((zW-relW)/2));
-                        $('#largeImg').css('padding-left',paddingLeft).css('height',zH).attr('src',this.src);
+                        left = parseInt((zW-relW)/2);
+                        $('#largeImg').css({
+                            'left' : left,
+                            'top' : 0,
+                            'height' : zH,
+                            'width' : relW
+                        }).attr({
+                            'data-id' : id,
+                            'src' : this.src
+                        });
                     }
 
-                    
+                    callback&&callback();
+
+                    $('#container-large img')[0].addEventListener('webkitAnimationEnd', function(){
+                        $(this).removeClass('animated bounceInRight bounceInLeft');
+                        this.removeEventListener('webkitAnimationEnd');
+                    })
+
                 }
            }
+
+           $('#container-large')
+           .tap(function(){
+                $('#container-large').hide();
+           })
+           .swipeLeft(function(){
+                var cId = $(this).find('img').attr('data-id');
+                ++cId;
+                if(cId>=total+base){
+                    cId = base;
+                }
+                showLarge(cId,function(){
+                    $('#container-large img').addClass('animated bounceInRight')
+                });
+           })
+           .swipeRight(function(){
+
+                var cId = $(this).find('img').attr('data-id');
+                --cId;
+                if( cId<base ){
+                    cId = total+base-1;
+                }
+                showLarge(cId,function(){
+                    $('#container-large img').addClass('animated bounceInLeft')
+                });
+           })
+
+
 
         })
 

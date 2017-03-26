@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>玩儿转红包照片</title>
+    <style>
+        .box{
+            width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        img{
+            width: 600px;
+            height: 375px;
+            position: relative;
+            left: 0;
+            top: 0;
+            z-index: 1;
+            filter : blur(10px);
+        }
+        canvas{
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 88;
+        }
+        .button{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 50px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+        }
+        .button span{
+            display: inline-block;
+            padding: 5px 20px;
+            color: #fff;
+            border-radius: 4px;
+            margin: 0 20px;
+            cursor: pointer;
+        }
+        .button span:hover{
+            opacity: 0.8;
+        }
+        #reset{
+            background: blue;
+        }
+        #show{
+            background: green;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <img src="images/1.jpg"  alt="" />
+        <canvas id="cvs"></canvas>
+        <div class="button">
+            <span id="reset">reset</span>
+            <span id="show">show</span>
+        </div>
+    </div>
+
+    <script>
+        var winW = 600;
+        var winH = 375;
+        var r = sr = 50;
+        var reset = document.getElementById('reset');
+        var show = document.getElementById('show');
+        var cvs = document.getElementById('cvs');
+        var context = cvs.getContext("2d");
+        var pos = {};
+        cvs.width = winW;
+        cvs.height =  winH;
+        var img = new Image();
+        img.src = 'images/1.jpg';
+        img.onload = function(){
+            draw('reset');
+        }
+
+        function draw(type){
+            context.beginPath();
+            context.save();
+            if( type=='reset' ){
+                getRandomPos();
+            }
+            context.arc(pos.x, pos.y, r, 0, 2*Math.PI);
+            context.clip();
+            context.drawImage(img, 0, 0, cvs.width, cvs.height);
+            context.restore();
+        }
+
+        function getRandomPos(){
+            pos.x = Math.random()*winW;
+            pos.y = Math.random()*winH;
+            if(pos.x<r){
+                pos.x = r;
+            }
+            if(pos.x>winW-r){
+                pos.x = winW-r;
+            }
+            if(pos.y<r){
+                pos.y = r;
+            }
+            if(pos.y>winW-r){
+                pos.y = winH-r;
+            }
+
+        }
+
+        reset.onclick = function(){
+            context.clearRect(0, 0, winW, winH);
+            r = sr;
+            draw('reset');
+        }
+
+        show.onclick = function(){
+            if(!interval){
+                var interval = setInterval(function(){
+                r = r+40;
+                if(r>666){
+                    clearInterval(interval);
+                    r = sr;
+                }
+                draw();
+                }, 30); 
+            }
+            
+            
+        }
+
+    </script>
+    
+</body>
+</html>

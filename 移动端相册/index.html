@@ -75,16 +75,16 @@
                     var imgH = this.height;
                     var zW = win.width();
                     var zH = win.height();
-                    var relW = imgH/imgW*zW;
-                    var relH = imgW/imgH*zH; 
+                    var relW = imgW/imgH*zH;
+                    var relH = imgH/imgW*zW; 
                     var paddingTop=0,paddingLeft=0;
-                    if(imgW/imgH > 1.2){
+                    if(imgW/imgH > 1.2 && relH<=zH ){
                         paddingTop = Math.abs(parseInt((zH-relH)/2));
                         
-                        $('#largeImg').css('padding-top',paddingTop).css('width',zW).attr('src',this.src);
+                        $('#largeImg').css('padding-top',paddingTop).css('width',zW).attr('src',this.src).css('padding-left','0').css('height',relH);
                     }else{
                         paddingLeft = Math.abs(parseInt((zW-relW)/2));
-                        $('#largeImg').css('padding-left',paddingLeft).css('height',zH).attr('src',this.src);
+                        $('#largeImg').css('padding-left',paddingLeft).css('height',zH).attr('src',this.src).css('padding-top','0').css('width',relW);
                     }
 
                     
@@ -92,6 +92,10 @@
            }
 
         })
+
+        $('#container-large').click(function(event) {
+            $(this).hide();
+        });
 
 
     </script>
